@@ -370,13 +370,31 @@
       const status = document.getElementById('globalStatus');
       status.textContent = 'Loading…';
       await loadFromDriveLink(raw, (data) => {
-        status.textContent = 'Loaded. Switch to the relevant tab or inspect the JSON structure.';
-        // Simple routing: if it looks like a funding queue, go there
         if (data.shortlist || data.rejections) {
           renderFunding(data);
           showPanel('funding');
+          status.textContent = 'Funding queue loaded.';
+        } else if (data.modules && Array.isArray(data.modules)) {
+          // Render Aurora system status into Overview
+          let html = `<div class="section-title">${escapeHtml(data.title || 'System Status')}</div>`;
+          html += `<div class="card"><div class="meta">${escapeHtml(data.summary || '')}</div></div>`;
+          html += `<div class="module-grid">`;
+          data.modules.forEach(m => {
+            html += `<div class="card"><h3>${escapeHtml(m.name)}</h3><div class="meta">Status: ${escapeHtml(m.status || '')} · ${escapeHtml(m.last_update || '')}</div><div class="meta">${escapeHtml(m.description || '')}</div>${m.next ? `<div class="meta"><strong>Next:</strong> ${escapeHtml(m.next)}</div>` : ''}</div>`;
+          });
+          html += `</div>`;
+          if (data.next_concrete_actions) {
+            html += `<div class="section-title">Next Actions</div><ul class="reasons">`;
+            data.next_concrete_actions.forEach(a => html += `<li>${escapeHtml(a)}</li>`);
+            html += `</ul>`;
+          }
+          document.getElementById('overview').innerHTML = html + document.getElementById('overview').querySelector('.section-title').outerHTML + document.getElementById('overview').querySelector('.module-grid').outerHTML + document.getElementById('overview').querySelector('.section-title:last-of-type').outerHTML + document.getElementById('overview').querySelector('.row').outerHTML + document.getElementById('globalStatus').outerHTML;
+          // simpler: just replace the module grid area
+          const grid = document.querySelector('#overview .module-grid');
+          if (grid) grid.outerHTML = `<div class="module-grid">${data.modules.map(m => `<div class="card"><h3>${escapeHtml(m.name)}</h3><div class="meta">Status: ${escapeHtml(m.status||'')} ${m.last_update?'· '+escapeHtml(m.last_update):''}</div><div class="meta">${escapeHtml(m.description||'')}</div>${m.next?`<div class="meta"><strong>Next:</strong> ${escapeHtml(m.next)}</div>`:''}</div>`).join('')}</div>`;
+          status.textContent = 'Aurora system status loaded from Drive.';
         } else {
-          status.textContent = 'Module JSON loaded (no auto-route). Use the panels above.';
+          status.textContent = 'Module JSON loaded (no auto-route).';
         }
       });
     });
