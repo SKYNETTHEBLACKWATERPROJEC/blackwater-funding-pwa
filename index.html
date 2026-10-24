@@ -100,6 +100,10 @@
         <input type="file" id="fileInput" accept=".json" style="display:none">
       </label>
       <button id="sampleBtn" class="secondary">Load Sample</button>
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+        <input id="driveUrl" type="text" placeholder="Paste Google Drive share link" style="flex:1; min-width:200px; padding:8px; border-radius:6px; border:1px solid var(--border); background:#111; color:var(--text);">
+        <button id="loadDriveBtn">Load from Drive</button>
+      </div>
     </div>
   </header>
 
@@ -234,6 +238,35 @@
         ]
       };
       render(sample);
+    });
+
+    document.getElementById('loadDriveBtn').addEventListener('click', async () => {
+      const raw = document.getElementById('driveUrl').value.trim();
+      if (!raw) {
+        content.innerHTML = '<div class="empty">Paste a Google Drive share link first.</div>';
+        return;
+      }
+      // Convert common Drive share URLs to direct download
+      let fileId = null;
+      const m1 = raw.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      const m2 = raw.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (m1) fileId = m1[1];
+      else if (m2) fileId = m2[1];
+      if (!fileId) {
+        content.innerHTML = '<div class="empty">Could not find a file ID in that link.</div>';
+        return;
+      }
+      const direct = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      content.innerHTML = '<div class="empty">Loading from Drive…</div>';
+      try {
+        const res = await fetch(direct);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const data = JSON.parse(text);
+        render(data);
+      } catch (err) {
+        content.innerHTML = `<div class="empty">Failed to load from Drive: ${escapeHtml(err.message)}<br>Make sure the file is shared as “Anyone with the link can view”.</div>`;
+      }
     });
   </script>
 </body>
