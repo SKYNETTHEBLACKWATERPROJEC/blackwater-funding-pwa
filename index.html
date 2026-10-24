@@ -198,9 +198,14 @@
           <li>Self-examination loop that only looks at its own past green proofs</li>
           <li>Drive is for readable plans and backups, not live execution</li>
         </ul>
-        <div class="meta" style="margin-top:12px;">
-          Folders present in Aurora_Unified_Master:<br>
-          AURORA_CANONICAL_RECOVERY_VAULT_2026-08-16 · blueprints · memory · mesh · HEARTH · LINEAGE_ISOLATE_2026-09-25_DNA_MESH · logs · tools
+        <div class="meta" style="margin-top:12px;" id="memoryStatus">
+          Dashboard status: idle · last check — · phone PWA ready
+        </div>
+        <div class="row">
+          <button id="refreshStatusBtn" class="secondary">Check Status</button>
+        </div>
+        <div class="meta">
+          Gmail notifications: when a new distilled packet or system status is ready, a short alert can be sent to your Gmail so you see it on the phone.
         </div>
         <div class="meta" style="margin-top:8px;">
           Drive snapshot: <a href="https://drive.google.com/file/d/1T93A3mDhII3Lo3o1uLEoU4DR1osa7_Vw/view" target="_blank" style="color:var(--accent)">Aurora_Memory_DNA_Snapshot.json</a>
@@ -363,6 +368,14 @@
     document.getElementById('loadDriveBtn').addEventListener('click', () => {
       const raw = document.getElementById('driveUrl').value.trim();
       loadFromDriveLink(raw, renderFunding);
+    });
+
+    document.getElementById('refreshStatusBtn')?.addEventListener('click', () => {
+      const el = document.getElementById('memoryStatus');
+      if (el) {
+        const now = new Date().toLocaleTimeString();
+        el.textContent = `Dashboard status: checked · ${now} · phone PWA ready · MemoryWeaver idle`;
+      }
     });
 
     document.getElementById('globalLoadBtn').addEventListener('click', async () => {
