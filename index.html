@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blackwater Funding Engine</title>
+  <title>Aurora Blackwater System</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a1d24">
   <style>
@@ -30,14 +30,34 @@
       padding: 16px 20px;
       background: var(--card);
       border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
     }
-    h1 { margin: 0; font-size: 1.25rem; }
-    .subtitle { color: var(--muted); font-size: 0.85rem; }
+    h1 { margin: 0; font-size: 1.35rem; }
+    .subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+    nav {
+      display: flex;
+      gap: 8px;
+      padding: 12px 20px;
+      background: #15181e;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    nav button {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid transparent;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    nav button.active {
+      background: var(--card);
+      color: var(--accent);
+      border-color: var(--border);
+    }
+    main { padding: 16px 20px; max-width: 960px; margin: 0 auto; }
+    .panel { display: none; }
+    .panel.active { display: block; }
     button, .file-label {
       background: var(--accent);
       color: #000;
@@ -49,12 +69,17 @@
       font-size: 0.9rem;
     }
     button.secondary { background: #333; color: var(--text); }
-    main { padding: 16px 20px; max-width: 900px; margin: 0 auto; }
-    .section-title {
-      margin: 24px 0 12px;
-      font-size: 1.1rem;
-      color: var(--accent);
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+    input[type="text"] {
+      flex: 1;
+      min-width: 220px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #111;
+      color: var(--text);
     }
+    .section-title { margin: 20px 0 12px; font-size: 1.1rem; color: var(--accent); }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -77,55 +102,131 @@
     .disposition.needs_review, .disposition.conflicting { background: #e65100; color: #ffe0b2; }
     .reasons { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 0.9rem; }
     .empty { color: var(--muted); text-align: center; padding: 40px 0; }
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    .module-card { cursor: pointer; transition: border-color 0.15s; }
+    .module-card:hover { border-color: var(--accent); }
+    footer { text-align: center; padding: 24px; color: var(--muted); font-size: 0.8rem; }
     @media (max-width: 600px) {
-      header { flex-direction: column; align-items: flex-start; }
+      nav { padding: 8px 12px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <div>
-      <h1>Blackwater Funding Engine</h1>
-      <div class="subtitle">Pass 5 Review Queue · Local-first</div>
-    </div>
-    <div>
-      <label class="file-label">
-        Load JSON
-        <input type="file" id="fileInput" accept=".json" style="display:none">
-      </label>
-      <button id="sampleBtn" class="secondary">Load Sample</button>
-      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
-        <input id="driveUrl" type="text" placeholder="Paste Google Drive share link" style="flex:1; min-width:200px; padding:8px; border-radius:6px; border:1px solid var(--border); background:#111; color:var(--text);">
-        <button id="loadDriveBtn">Load from Drive</button>
-      </div>
-    </div>
+    <h1>Aurora Blackwater System</h1>
+    <div class="subtitle">Modular local-first dashboard · Funding · Mesh · Memory · EcoTec</div>
   </header>
 
+  <nav>
+    <button class="active" data-panel="overview">Overview</button>
+    <button data-panel="funding">Funding Engine</button>
+    <button data-panel="mesh">Mesh / Agents</button>
+    <button data-panel="memory">Memory</button>
+    <button data-panel="ecotec">EcoTec</button>
+  </nav>
+
   <main>
-    <div id="content">
-      <div class="empty">Load a review-queue JSON export from the Python engine, or click “Load Sample” to see the layout.</div>
+    <!-- Overview -->
+    <div id="overview" class="panel active">
+      <div class="section-title">System Modules</div>
+      <div class="module-grid">
+        <div class="card module-card" onclick="showPanel('funding')">
+          <h3>Funding Engine</h3>
+          <div class="meta">Pass 1–5 opportunity matching, verification, and human review queue.</div>
+        </div>
+        <div class="card module-card" onclick="showPanel('mesh')">
+          <h3>Blackwater Mesh</h3>
+          <div class="meta">Multi-provider nodes (Grok, Gemini, GPT, local). Status and handshakes.</div>
+        </div>
+        <div class="card module-card" onclick="showPanel('memory')">
+          <h3>MemoryWeaver</h3>
+          <div class="meta">Persistent state, lineage, and reflection cycles.</div>
+        </div>
+        <div class="card module-card" onclick="showPanel('ecotec')">
+          <h3>EcoTec / Regenerative</h3>
+          <div class="meta">Resource loops, opportunity catalogs, class-lock tracking.</div>
+        </div>
+      </div>
+      <div class="section-title">Load any module JSON</div>
+      <div class="row">
+        <input id="globalDriveUrl" type="text" placeholder="Paste a Drive link to any Aurora module JSON">
+        <button id="globalLoadBtn">Load Module</button>
+      </div>
+      <div id="globalStatus" class="meta"></div>
+    </div>
+
+    <!-- Funding -->
+    <div id="funding" class="panel">
+      <div class="row">
+        <label class="file-label">
+          Load JSON
+          <input type="file" id="fileInput" accept=".json" style="display:none">
+        </label>
+        <button id="sampleBtn" class="secondary">Load Sample</button>
+        <input id="driveUrl" type="text" placeholder="Drive link for review queue">
+        <button id="loadDriveBtn">Load from Drive</button>
+      </div>
+      <div id="fundingContent">
+        <div class="empty">Load a review-queue JSON or click “Load Sample”.</div>
+      </div>
+    </div>
+
+    <!-- Mesh -->
+    <div id="mesh" class="panel">
+      <div class="section-title">Blackwater Mesh</div>
+      <div class="card">
+        <h3>Provider Nodes</h3>
+        <div class="meta">Grok · Gemini · GPT · Local · Future</div>
+        <p class="meta">Load a mesh status JSON via the Overview “Load Module” box or drop a file here later. Placeholder for agent handshakes, Ohana protocol status, and STICH harvest results.</p>
+      </div>
+      <div id="meshContent"></div>
+    </div>
+
+    <!-- Memory -->
+    <div id="memory" class="panel">
+      <div class="section-title">MemoryWeaver</div>
+      <div class="card">
+        <h3>Persistent Memory</h3>
+        <div class="meta">Lineage, reflection, deduplication</div>
+        <p class="meta">Load memory snapshots or ledger JSON. Placeholder for Aurora_Unified_Master continuity.</p>
+      </div>
+      <div id="memoryContent"></div>
+    </div>
+
+    <!-- EcoTec -->
+    <div id="ecotec" class="panel">
+      <div class="section-title">EcoTec / Regenerative Loops</div>
+      <div class="card">
+        <h3>Opportunity Catalog & Class Lock</h3>
+        <div class="meta">Digital desk / voice / async only · physical_control_enabled=False</div>
+        <p class="meta">Load EcoTec event or catalog JSON. Placeholder for XLOOP prototypes and fractional wealth tracking.</p>
+      </div>
+      <div id="ecotecContent"></div>
     </div>
   </main>
 
-  <footer>Aurora / Blackwater · Local Funding Engine</footer>
+  <footer>Aurora / Blackwater · Modular System Dashboard</footer>
 
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 
-    const content = document.getElementById('content');
+    function showPanel(id) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelector(`nav button[data-panel="${id}"]`).classList.add('active');
+    }
+    document.querySelectorAll('nav button').forEach(btn => {
+      btn.addEventListener('click', () => showPanel(btn.dataset.panel));
+    });
+
+    const fundingContent = document.getElementById('fundingContent');
     const fileInput = document.getElementById('fileInput');
     const sampleBtn = document.getElementById('sampleBtn');
 
-    function render(data) {
-      // Accept either {shortlist, rejections} or a flat array of queue items
+    function renderFunding(data) {
       let shortlist = [];
       let rejections = [];
       if (Array.isArray(data)) {
@@ -135,31 +236,19 @@
         shortlist = data.shortlist || [];
         rejections = data.rejections || data.flagged || [];
       }
-
-      let html = '';
-      html += `<div class="section-title">Verified Shortlist (${shortlist.length})</div>`;
-      if (shortlist.length === 0) {
-        html += `<div class="card"><div class="meta">No verified matches in this export.</div></div>`;
-      } else {
-        shortlist.forEach(item => {
-          html += cardHtml(item, true);
-        });
-      }
-
+      let html = `<div class="section-title">Verified Shortlist (${shortlist.length})</div>`;
+      if (!shortlist.length) html += `<div class="card"><div class="meta">No verified matches.</div></div>`;
+      else shortlist.forEach(item => html += cardHtml(item));
       html += `<div class="section-title">Flagged / Needs Review (${rejections.length})</div>`;
-      if (rejections.length === 0) {
-        html += `<div class="card"><div class="meta">No flagged items.</div></div>`;
-      } else {
-        rejections.forEach(item => {
-          // rejections may be plain reason objects or full payloads
-          const payload = item.review_queue_payload || item;
-          html += cardHtml(payload, false, item.reason);
-        });
-      }
-      content.innerHTML = html;
+      if (!rejections.length) html += `<div class="card"><div class="meta">No flagged items.</div></div>`;
+      else rejections.forEach(item => {
+        const payload = item.review_queue_payload || item;
+        html += cardHtml(payload, item.reason);
+      });
+      fundingContent.innerHTML = html;
     }
 
-    function cardHtml(item, isShortlist, extraReason) {
+    function cardHtml(item, extraReason) {
       const disp = (item.verification_disposition || 'unknown').replace('_', ' ');
       const dispClass = item.verification_disposition || 'unknown';
       const score = item.composite_score != null ? item.composite_score.toFixed(4) : '—';
@@ -191,82 +280,88 @@
         .replace(/"/g, '"');
     }
 
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        try {
-          const data = JSON.parse(ev.target.result);
-          render(data);
-        } catch (err) {
-          content.innerHTML = `<div class="empty">Could not parse JSON: ${escapeHtml(err.message)}</div>`;
-        }
-      };
-      reader.readAsText(file);
-    });
-
-    sampleBtn.addEventListener('click', () => {
-      const sample = {
-        shortlist: [
-          {
-            name: "Florida Gulf Coast Ecological Protection Grant",
-            funding_type: "grant",
-            provider_name: "Florida DEP",
-            composite_score: 0.8742,
-            verification_disposition: "verified",
-            official_url: "https://dep.state.fl.us",
-            eligibility_reasons: [],
-            verification_notes: "Provenance and status checks passed."
-          }
-        ],
-        rejections: [
-          {
-            reason: "Pass 4 Verification Gate Blocked Processing. State: 'conflicting'.",
-            review_queue_payload: {
-              name: "Federal Adaptive Infrastructure Innovation Prize",
-              opportunity_id: "GRANT-CONFLICTED",
-              funding_type: "prize",
-              provider_name: "FEMA",
-              composite_score: 0.0,
-              verification_disposition: "conflicting",
-              official_url: "https://fema.gov",
-              verification_notes: "Deadlocked status claims with equal weight: ['open', 'closed']",
-              eligibility_reasons: []
-            }
-          }
-        ]
-      };
-      render(sample);
-    });
-
-    document.getElementById('loadDriveBtn').addEventListener('click', async () => {
-      const raw = document.getElementById('driveUrl').value.trim();
-      if (!raw) {
-        content.innerHTML = '<div class="empty">Paste a Google Drive share link first.</div>';
-        return;
-      }
-      // Convert common Drive share URLs to direct download
+    async function loadFromDriveLink(raw, targetFn) {
+      if (!raw) return;
       let fileId = null;
       const m1 = raw.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       const m2 = raw.match(/[?&]id=([a-zA-Z0-9_-]+)/);
       if (m1) fileId = m1[1];
       else if (m2) fileId = m2[1];
       if (!fileId) {
-        content.innerHTML = '<div class="empty">Could not find a file ID in that link.</div>';
+        alert('Could not find a file ID in that link.');
         return;
       }
       const direct = `https://drive.google.com/uc?export=download&id=${fileId}`;
-      content.innerHTML = '<div class="empty">Loading from Drive…</div>';
       try {
         const res = await fetch(direct);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
         const data = JSON.parse(text);
-        render(data);
+        targetFn(data);
       } catch (err) {
-        content.innerHTML = `<div class="empty">Failed to load from Drive: ${escapeHtml(err.message)}<br>Make sure the file is shared as “Anyone with the link can view”.</div>`;
+        alert(`Failed to load: ${err.message}\nMake sure the file is shared as “Anyone with the link can view”.`);
       }
+    }
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try { renderFunding(JSON.parse(ev.target.result)); }
+        catch (err) { fundingContent.innerHTML = `<div class="empty">Parse error: ${escapeHtml(err.message)}</div>`; }
+      };
+      reader.readAsText(file);
+    });
+
+    sampleBtn.addEventListener('click', () => {
+      renderFunding({
+        shortlist: [{
+          name: "Florida Gulf Coast Ecological Protection Grant",
+          funding_type: "grant",
+          provider_name: "Florida DEP",
+          composite_score: 0.8742,
+          verification_disposition: "verified",
+          official_url: "https://dep.state.fl.us",
+          eligibility_reasons: [],
+          verification_notes: "Provenance and status checks passed."
+        }],
+        rejections: [{
+          reason: "Pass 4 Verification Gate Blocked Processing. State: 'conflicting'.",
+          review_queue_payload: {
+            name: "Federal Adaptive Infrastructure Innovation Prize",
+            opportunity_id: "GRANT-CONFLICTED",
+            funding_type: "prize",
+            provider_name: "FEMA",
+            composite_score: 0.0,
+            verification_disposition: "conflicting",
+            official_url: "https://fema.gov",
+            verification_notes: "Deadlocked status claims with equal weight: ['open', 'closed']",
+            eligibility_reasons: []
+          }
+        }]
+      });
+    });
+
+    document.getElementById('loadDriveBtn').addEventListener('click', () => {
+      const raw = document.getElementById('driveUrl').value.trim();
+      loadFromDriveLink(raw, renderFunding);
+    });
+
+    document.getElementById('globalLoadBtn').addEventListener('click', async () => {
+      const raw = document.getElementById('globalDriveUrl').value.trim();
+      const status = document.getElementById('globalStatus');
+      status.textContent = 'Loading…';
+      await loadFromDriveLink(raw, (data) => {
+        status.textContent = 'Loaded. Switch to the relevant tab or inspect the JSON structure.';
+        // Simple routing: if it looks like a funding queue, go there
+        if (data.shortlist || data.rejections) {
+          renderFunding(data);
+          showPanel('funding');
+        } else {
+          status.textContent = 'Module JSON loaded (no auto-route). Use the panels above.';
+        }
+      });
     });
   </script>
 </body>

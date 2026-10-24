@@ -1,7 +1,7 @@
 {
-  "name": "Blackwater Funding Engine",
-  "short_name": "Blackwater",
-  "description": "Local-first funding opportunity review queue for Aurora/Blackwater",
+  "name": "Aurora Blackwater System",
+  "short_name": "Aurora",
+  "description": "Modular local-first dashboard for the Aurora/Blackwater ecosystem",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f1115",
