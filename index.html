@@ -147,11 +147,13 @@
           <div class="meta">Resource loops, opportunity catalogs, class-lock tracking.</div>
         </div>
       </div>
-      <div class="section-title">Load any module JSON</div>
+      <div class="section-title">Auto-Refresh Verified Status</div>
       <div class="row">
-        <input id="globalDriveUrl" type="text" placeholder="Paste a Drive link to any Aurora module JSON">
-        <button id="globalLoadBtn">Load Module</button>
+        <input id="autoRefreshUrl" type="text" placeholder="Public Drive or raw JSON URL for auto-refresh">
+        <button id="startAutoBtn">Start Auto-Refresh (30s)</button>
+        <button id="stopAutoBtn" class="secondary">Stop</button>
       </div>
+      <div id="autoStatus" class="meta">Auto-refresh: off</div>
       <div id="globalStatus" class="meta"></div>
     </div>
 
@@ -376,6 +378,42 @@
         const now = new Date().toLocaleTimeString();
         el.textContent = `Dashboard status: checked · ${now} · phone PWA ready · MemoryWeaver idle`;
       }
+    });
+
+    let autoRefreshTimer = null;
+
+    document.getElementById('startAutoBtn')?.addEventListener('click', () => {
+      const raw = document.getElementById('autoRefreshUrl').value.trim();
+      if (!raw) {
+        document.getElementById('autoStatus').textContent = 'Auto-refresh: paste a URL first';
+        return;
+      }
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      const doRefresh = async () => {
+        document.getElementById('autoStatus').textContent = 'Auto-refresh: checking…';
+        await loadFromDriveLink(raw, (data) => {
+          if (data.shortlist || data.rejections) {
+            renderFunding(data);
+            showPanel('funding');
+          } else if (data.modules) {
+            // reuse existing overview render path if present
+            document.getElementById('globalStatus').textContent = 'Auto-loaded system status';
+          }
+          document.getElementById('autoStatus').textContent =
+            `Auto-refresh: last pull ${new Date().toLocaleTimeString()}`;
+        });
+      };
+      doRefresh();
+      autoRefreshTimer = setInterval(doRefresh, 30000);
+      document.getElementById('autoStatus').textContent = 'Auto-refresh: started (30s)';
+    });
+
+    document.getElementById('stopAutoBtn')?.addEventListener('click', () => {
+      if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
+        autoRefreshTimer = null;
+      }
+      document.getElementById('autoStatus').textContent = 'Auto-refresh: stopped';
     });
 
     document.getElementById('globalLoadBtn').addEventListener('click', async () => {
